@@ -1,46 +1,95 @@
 import 'package:flutter/material.dart';
 
-class MyHomePage extends StatelessWidget {
-  var title;
-  MyHomePage({Key key, this.title}) : super(key: key);
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = new ScrollController();
+    _scrollController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: new AppBar(
-          elevation: 0.0,
-          backgroundColor: Colors.yellow.shade700,
-          leading: Icon(Icons.arrow_back),
-          actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.screen_share,
-                  )),
+        body: Stack(
+      children: <Widget>[
+        CustomScrollView(
+          controller: _scrollController,
+          slivers: <Widget>[
+            SliverAppBar(
+              leading: Icon(Icons.arrow_back),
+              actions: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Icon(Icons.screen_share),
+                )
+              ],
+              expandedHeight: 300.0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Image.asset("assets/account_pictures/user_3.jpg",
+                    fit: BoxFit.cover),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                  List.generate(1, (index) => constructWidget())),
             )
           ],
         ),
-        body: ListView(
-          children: <Widget>[
-            Stack(
-              alignment: AlignmentDirectional.topEnd,
-              children: <Widget>[
-                constructWidget(),
-                Positioned(
-                  top: 200.0 -
-                      56.0 /
-                          2, //56.0 is the height of Material FAB, whic places it in the corect position
-                  right: 24.0,
-                  child: new FloatingActionButton(
-                    onPressed: () {},
-                    child: Icon(Icons.shopping_basket, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ));
+        buildPositioned(),
+      ],
+    ));
+  }
+
+  Positioned buildPositioned() {
+    //starting fab position
+    final double defaultTopMargin = 300.0 - 4.0;
+    //pixels from top where scaling should start
+    final double scaleStart = 96.0;
+    //pixels from top where scaling should end
+    final double scaleEnd = scaleStart / 2;
+
+    double top = defaultTopMargin;
+    double scale = 1.0;
+    if (_scrollController.hasClients) {
+      double offset = _scrollController.offset;
+      top -= offset;
+      if (offset < defaultTopMargin - scaleStart) {
+        //offset small => don't scale down
+        scale = 1.0;
+      } else if (offset < defaultTopMargin - scaleEnd) {
+        //offset between scaleStart and scaleEnd => scale down
+        scale = (defaultTopMargin - scaleEnd - offset) / scaleEnd;
+      } else {
+        //offset passed scaleEnd => hide fab
+        scale = 0.0;
+      }
+    }
+    
+    return Positioned(
+      top: top,
+      right: 16.0,
+      child: Transform(
+        transform: new Matrix4.identity()..scale(scale),
+              child: new FloatingActionButton(
+          onPressed: () {},
+          child: new Icon(Icons.shopping_cart),
+        ),
+      ),
+    );
   }
 }
 
@@ -49,10 +98,6 @@ Widget constructWidget() {
       "To help redue this morning's fuzz, make yourself this juice that includes natural sugar, vitamin C, antioxidants, electrolytes and supports the natural detoxification pathways in the liver and reduces inflammation. Recieve a crate with 30 Cactus Juices every month and hangovers will be history";
   return new Column(
     children: <Widget>[
-      new Container(
-        height: 200.0,
-        color: Colors.yellow.shade700,
-      ),
       Padding(
         padding: EdgeInsets.all(24.0),
         child: Column(
@@ -69,20 +114,20 @@ Widget constructWidget() {
                   style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade700),
+                      color: Colors.black87),
                 ),
                 Text("\u20B9 299",
                     style: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade700))
+                        color: Colors.black87))
               ],
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Text(
                 strData,
-                style: TextStyle(fontSize: 16.0),
+                style: TextStyle(fontSize: 16.0, color: Colors.black87),
                 textAlign: TextAlign.justify,
               ),
             ),
@@ -166,46 +211,50 @@ Widget constructWidget() {
             ),
             Divider(),
             SizedBox(
-              height: 10.0,
+              height: 20.0,
             ),
-            Text("More hangover cures",
-                textAlign: TextAlign.justify,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold)),
+            Row(
+              children: <Widget>[
+                Text("More hangover cures",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
             SizedBox(
               height: 36.0,
             ),
             SizedBox(
-              height: 150.0,
+              height: 120.0,
               child: ListView.builder(
-                itemCount: 5,
+                itemCount: 4,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, position) {
+                  String imgUrl = "assets/account_pictures/user_" +
+                      (position + 1).toString() +
+                      ".jpg";
                   return Padding(
                     padding: const EdgeInsets.only(right: 36.0),
-                    child: Material(
-                      elevation: 8.0,
-                      child: Container(
-                        width: 150.0,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12.0),
-                            child: Image.asset(
-                                "assets/account_pictures/user_4.jpg")),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.0),
+                      child: Material(
+                        elevation: 8.0,
+                        child: Container(
+                          width: 120.0,
+                          child: Image.asset(imgUrl),
+                        ),
                       ),
                     ),
                   );
                 },
               ),
-            )
+            ),
+           SizedBox(height: 500.0,)
           ],
         ),
       )
     ],
   );
-}
-
-Widget getList() {
-  return Text("Get");
 }
