@@ -39,8 +39,7 @@ class _HomePageState extends State<HomePage> {
               ],
               expandedHeight: 300.0,
               flexibleSpace: FlexibleSpaceBar(
-                background: Image.asset("assets/account_pictures/user_3.jpg",
-                    fit: BoxFit.cover),
+                background: Image.asset("assets/main.jpeg", fit: BoxFit.cover),
               ),
             ),
             SliverList(
@@ -78,15 +77,15 @@ class _HomePageState extends State<HomePage> {
         scale = 0.0;
       }
     }
-    
+
     return Positioned(
       top: top,
       right: 16.0,
       child: Transform(
         transform: new Matrix4.identity()..scale(scale),
-              child: new FloatingActionButton(
+        child: new FloatingActionButton(
           onPressed: () {},
-          child: new Icon(Icons.shopping_cart),
+          child: new Icon(Icons.shopping_basket),
         ),
       ),
     );
@@ -102,8 +101,9 @@ Widget constructWidget() {
         padding: EdgeInsets.all(24.0),
         child: Column(
           children: <Widget>[
+            discountWidget(),
             SizedBox(
-              height: 50.0,
+              height: 24.0,
             ),
             Row(
               mainAxisSize: MainAxisSize.max,
@@ -224,37 +224,67 @@ Widget constructWidget() {
               ],
             ),
             SizedBox(
-              height: 36.0,
+              height: 12.0,
             ),
-            SizedBox(
-              height: 120.0,
-              child: ListView.builder(
-                itemCount: 4,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, position) {
-                  String imgUrl = "assets/account_pictures/user_" +
-                      (position + 1).toString() +
-                      ".jpg";
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 36.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: Material(
-                        elevation: 8.0,
-                        child: Container(
-                          width: 120.0,
-                          child: Image.asset(imgUrl),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-           SizedBox(height: 500.0,)
           ],
         ),
+      ),
+      cardsSlider(),
+      SizedBox(
+        height: 300.0,
       )
+    ],
+  );
+}
+
+SizedBox cardsSlider() {
+  return SizedBox(
+    height: 140.0,
+    child: ListView.builder(
+      itemCount: 5,
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (context, position) {
+        String imgUrl = "assets/" + (position + 1).toString() + ".jpg";
+        return Padding(
+          padding: const EdgeInsets.only(left: 24.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: Material(
+              elevation: 8.0,
+              child: Container(
+                width: 140.0,
+                child: Image.asset(
+                  imgUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
+
+Row discountWidget() {
+  return Row(
+    children: <Widget>[
+      Container(
+          decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4.0),
+                  side: BorderSide(color: Colors.redAccent, width: 1.5))),
+          child: Center(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Text("25% DISCOUNT",
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold)),
+            ),
+          )),
     ],
   );
 }
